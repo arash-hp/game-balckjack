@@ -96,22 +96,29 @@ function showScore(activePlayer) {
     }
 }
 
-function dealerLogic() {
-    blackjackGame['isStand'] = true;
-    let card = randomCard();
-    showCard(card, DEALER);
-    updateScore(card, DEALER);
-    showScore(DEALER);
+function sleep(ms){
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-    if (DEALER['score'] > 15) {
-        blackjackGame['turnsOver'] = true;
-        let winner = computeWinner();
-        showResult(winner);
+async function dealerLogic() {
+    blackjackGame['isStand'] = true;
+
+    while (DEALER['score'] < 16 && blackjackGame['isStand'] === true) {
+        let card = randomCard();
+        showCard(card, DEALER);
+        updateScore(card, DEALER);
+        showScore(DEALER);
+        await sleep(1000); 
     }
+
+    blackjackGame['turnsOver'] = true;
+    let winner = computeWinner();
+    showResult(winner);
 }
 
 
 //computer winner and return who just won
+//update the wins, draws, and losses
 function computeWinner() {
     let winner;
 
@@ -145,17 +152,20 @@ function showResult(winner) {
 
     if (blackjackGame['turnsOver'] === true) {
         if (winner === YOU) {
-            message = 'Tou won!';
-            messageColor = 'green';
+            document.querySelector('#wins').textContent = blackjackGame['wins'];
+            message = 'You won!';
+            messageColor = 'white';
             winSound.play();
         } else if (winner === DEALER) {
+            document.querySelector('#losses').textContent = blackjackGame['losses'];
             message = 'You lost';
             messageColor = 'red';
             loseSound.play();
 
         } else {
-            message = 'you drew!'
-            messageColor = 'yellow'
+            document.querySelector('#draws').textContent = blackjackGame['draws'];
+            message = 'you drew!';
+            messageColor = 'yellow';
         }
 
         document.querySelector('#blackjack-result').textContent = message;
