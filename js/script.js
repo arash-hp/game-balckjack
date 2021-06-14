@@ -3,6 +3,9 @@ let blackjackGame = {
     'dealer': { 'scoreSpan': '#dealer-blackjack-result', 'div': '#dealer-box', 'score': 0 },
     'cards': ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'],
     'cardsMap': { '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 10, 'Q': 10, 'K': 10, 'A': [1, 11] },
+    'wins':'0',
+    'losses':'0',
+    'draws':'0',
 };
 
 const YOU = blackjackGame['you'];
@@ -41,7 +44,7 @@ function showCard(card, activePlayer) {
 }
 
 function blackjackDealer() {
-    showResult(computeWinner());
+   
     let yourImages = document.querySelector('#your-box').querySelectorAll('img');
     let dealerImages = document.querySelector('#dealer-box').querySelectorAll('img');
     for (i = 0; i < yourImages.length; i++) {
@@ -89,6 +92,11 @@ function dealerLogic() {
     showCard(card, DEALER);
     updateScore(card, DEALER);
     showScore(DEALER);
+
+    if(DEALER['score'] >15){
+        let winner = computeWinner();
+        showResult(winner);
+    }
 }
 
 
@@ -99,32 +107,32 @@ function computeWinner() {
     if (YOU['score'] <= 21) {
         //condition: higher score than dealer or when dealer bust but you 're
         if (YOU['score'] > DEALER['score'] || (DEALER['score'] > 21)) {
-            console.log('You won!');
+            blackjackGame['wins']++;
             winner = YOU;
         } else if (YOU['score'] < DEALER['score']) {
-            console.log('You lost!');
+            blackjackGame['losses']++;
             winner = DEALER;
         } else if (YOU['score'] === DEALER['score']) {
-            console.log('You drew!');
+            blackjackGame['draws']++;
         }
 
         //condition:when user busts but dealer doesn't
     } else if (YOU['score'] > 21 && DEALER['score'] <= 21) {
-        console.log('You lost!');
+        blackjackGame['losses']++;
         winner = DEALER;
 
         //condition: when you AND the dealer busts
     } else if (YOU['score'] > 21 && DEALER['score'] > 21) {
-        console.log('You drew');
+        blackjackGame['draws']++
     }
-    console.log('Winner is', winner)
+    console.log(blackjackGame);
     return winner;
 }
 
 function showResult(winner) {
     if (winner === YOU) {
         message = 'Tou won!';
-        messageColor = 'red';
+        messageColor = 'green';
         winSound.play();
     } else if (winner === DEALER) {
         message = 'You lost';
